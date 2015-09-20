@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialog xsi:noNamespaceSchemaLocation="WatsonDialogDocument_1.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <flow>
+        <folder label="Main">
+            <output>
+                <prompt selectionType="RANDOM">
+                    <item> Hi, I'm Dr D! I can help you diagnose your symptoms? How are you feeling right now?</item>
+                </prompt>
+                <goto ref="getUserInput_2442994"/>
+            </output>
+            <output>
+                <getUserInput id="getUserInput_2442994">
+                    <search ref="folder_1111"/>
+                    <default>
+                        <output>
+                            <prompt selectionType="RANDOM">
+                                <item>I'm sorry I did not understand your answer. All I can do is diagnose your sypmtoms</item>
+                                <item>I did not quite get that.</item>
+                                <item>I didnt grasp what you said.</item>
+                                <item>I'm not following you at the moment.</item>
+                            </prompt>
+                        </output>
+                    </default>
+                </getUserInput>
+            </output>
+        </folder>
+        <folder label="Library">
+            <folder label="Live Content" id="folder_1111">
+                <input>
+                    <grammar>
+                       <item>I have a headache</item>
+                       <item>$ I have a *</item>
+                       <item>$ I have *</item>
+                    </grammar>
+                    <output>
+                        <prompt selectionType="RANDOM"><item>Are you currently taking any medication?</item></prompt>
+                    </output>
+                </input>
+                <input>
+                    <grammar>
+                        <item>Yes! I am taking *</item>
+                        <item>Yes! *</item>
+                        <item>Thiazide Diuretics</item>
+                        <item>Beta Blockers</item>
+                        <item>Aldosterone</item>
+                    </grammar>
+                    <output>
+                        <prompt selectionType="RANDOM"><item>Did you have past medical conditions?</item></prompt>
+                    </output>
+                </input>
+                <input>
+                    <grammar>
+                        <item>None</item>
+                        <item>I don't have any</item>
+                        <item>Low Blood Pressure</item>
+                        <item>pre-hypertensive</item>
+                    </grammar>
+                </input>
+            </folder>
+            <folder label="Storage"/>
+        </folder>
+        <folder label="Concepts">
+            <concept>
+                <grammar>
+                    <item>disease</item>
+                    <item>symptoms</item>
+                    <item>signs</item>
+                </grammar>
+            </concept>
+        </folder>
+    </flow>
+</dialog>
