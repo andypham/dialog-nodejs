@@ -91,8 +91,6 @@ app.get('/diagnosis',function(req,res,next){
 
         inferenceEngineAPI.getObservation(params, value.trim(),function(err,results){
 
-            console.log(symptoms)
-
             list.push(results.body != null ? results.body.id : "*");
 
             if (list.length == symptoms.length) {
@@ -104,7 +102,8 @@ app.get('/diagnosis',function(req,res,next){
                     if(err1)
                         return next(err1);
                     else {
-                        res.json(results1.body.conditions ? results1.body.conditions[0] : 'No Match');
+
+                        res.json(results1.body.conditions ? results1.body.conditions[0] : {'message': 'No Match'});
 
                     }
                 });
