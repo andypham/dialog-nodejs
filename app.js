@@ -113,14 +113,6 @@ app.get('/diagnosis',function(req,res,next){
         });
     });
 
-
-
-
-    params.body = require("./serviceUtils/test.json");
-
-
-
-
 });
 
 app.get('/patientprofile', function(req,res,next){
