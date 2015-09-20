@@ -4,51 +4,62 @@
 
 'use strict';
 
-var requestFactory = require('../node_modules/watson-developer-cloud/lib/requestwrapper');
+var request= require('request');
 
 var url = "https://api.infermedica.com/v1/"
 
 
 
-function InferenfenceEngineAPI(){
+function InferenceEngineAPI(){
 
 
 }
 
-module.exports = function getDiagnosis(params, callback){
+InferenceEngineAPI.prototype.getDiagnosis = function (params,callback) {
 
     params = params || {};
 
     var parameters = {
         options: {
-            url: url+'/diagnosis',
+            url: 'https://api.infermedica.com/v1/diagnosis',
             method: 'POST',
             json: true,
-            path: params,
-            formData: params
+            body: params.body,
+            headers : {
+                app_id: params.app_id,
+                app_key: params.app_key
+            }
         },
         requiredParams: ['app_id', 'app_key'],
         defaultOptions: this._options
     };
-    return requestFactory(parameters, callback);
+
+    return request(parameters.options,callback);
+    //return requestFactory(parameters, callback);
 
 };
 
-module.export = function getObservationBySymptoms(params,phrase,callback) {
+InferenceEngineAPI.prototype.getObservation = function(params,phrase,callback){
+
+    params = params || {};
 
     var parameters = {
         options: {
-            url: url+'/lookup?phrase='+phrase,
+            url: 'https://api.infermedica.com/v1/lookup?phrase='+phrase,
             method: 'GET',
             json: true,
-            path: params,
-            qs: pick(params, ['client_id'])
+            headers : {
+                app_id: params.app_id,
+                app_key: params.app_key
+            }
         },
         requiredParams: ['app_id', 'app_key'],
         defaultOptions: this._options
     };
-    return requestFactory(parameters, callback);
-};
 
 
+    return request(parameters.options,callback);
+}
 
+
+module.exports = InferenceEngineAPI;
