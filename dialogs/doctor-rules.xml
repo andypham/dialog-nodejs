@@ -4,7 +4,7 @@
         <folder label="Main">
             <output>
                 <prompt selectionType="RANDOM">
-                    <item> Hi, I'm Dr D! I can help you diagnose your symptoms? How are you feeling right now?</item>
+                    <item> Hi, I'm your Virtual Assistant Nurse! I can help you diagnose your symptoms? How are you feeling right now?</item>
                 </prompt>
                 <goto ref="getUserInput_2442994"/>
             </output>
@@ -55,6 +55,9 @@
                         <item>Low Blood Pressure</item>
                         <item>pre-hypertensive</item>
                     </grammar>
+                    <output>
+                        <prompt selectionType="RANDOM"><item>Ok, let me get your diagnosis.</item></prompt>
+                    </output>
                 </input>
             </folder>
             <folder label="Storage"/>

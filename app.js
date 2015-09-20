@@ -21,26 +21,42 @@ var express  = require('express'),
   path       = require('path'),
   bluemix    = require('./config/bluemix'),
   extend     = require('util')._extend,
-  watson     = require('watson-developer-cloud');
+  watson     = require('watson-developer-cloud'),
+  cors       = require('cors'),
+  utilService = require('./serviceUtils/utilService');
 
+
+app.use(cors())
 // Bootstrap application settings
 require('./config/express')(app);
 
 // if bluemix credentials exists, then override local
 var credentials =  extend({
-  url: '<url>',
-  username: '<username>',
-  password: '<password>',
+  url: 'https://gateway.watsonplatform.net/dialog/api',
+  username: 'be8355a5-ba4f-464a-9341-19b547a53468',
+  password: 'pmiL5RhCM6T6',
   version: 'v1'
 }, bluemix.getServiceCreds('dialog')); // VCAP_SERVICES
 
-var dialog_id = process.env.DIALOG_ID || '<dialog-id>';
+var dialog_id = process.env.DIALOG_ID || '7068ef6e-befb-4618-94e3-1f3dbb134c4f';
 
 // Create the service wrapper
 var dialog = watson.dialog(credentials);
 
+//initially set as global variable
+var symptoms = ["headache", "vomiting"];
+var utility = new utilService();
+
 app.post('/conversation', function(req, res, next) {
+
   var params = extend({ dialog_id: dialog_id }, req.body);
+    //here parse the question and get the necessary data
+
+
+    symptoms = utility.extractList(req.body.input,"I have");
+
+    console.log(symptoms);
+
   dialog.conversation(params, function(err, results) {
     if (err)
       return next(err);
@@ -58,6 +74,59 @@ app.post('/profile', function(req, res, next) {
       res.json(results);
   });
 });
+
+app.get('/diagnosis',function(req,res,next){
+
+    //list all the necessary params here
+    var app_id = '944eff34', app_key = 'c54cc1d1c7ded416a9d9405b6a357488';
+
+    var params = {}
+    params.app_id = app_id;
+    params.app_key = app_key;
+
+
+    var list = [];
+    symptoms.forEach(function(value){
+
+        dialog.getObservation(params, value.trim(),function(err,results){
+
+
+            list.push(results.body != null ? results.body.id : "*");
+
+            if (list.length == symptoms.length) {
+
+                params.body = utility.constructDiagnosisBody("",list);
+
+                dialog.getDiagnosis(params,function(err1,results1){
+
+                    if(err1)
+                        return next(err1);
+                    else {
+                        res.json(results1.body.conditions[0]);
+
+                    }
+                });
+            }
+
+
+        });
+    });
+
+
+
+
+    params.body = require("./serviceUtils/test.json");
+
+
+
+
+});
+
+app.get('/patientprofile', function(req,res,next){
+
+    res.json({'name' : 'John Smith', 'age': '29'})
+
+})
 
 // error-handler settings
 require('./config/error-handler')(app);
