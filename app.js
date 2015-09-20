@@ -23,7 +23,8 @@ var express  = require('express'),
   extend     = require('util')._extend,
   watson     = require('watson-developer-cloud'),
   cors       = require('cors'),
-  utilService = require('./serviceUtils/utilService');
+  utilService = require('./serviceUtils/utilService'),
+  inferenceEngine = require('./serviceUtils/inferenceEngineAPI')
 
 
 app.use(cors())
@@ -38,7 +39,7 @@ var credentials =  extend({
   version: 'v1'
 }, bluemix.getServiceCreds('dialog')); // VCAP_SERVICES
 
-var dialog_id = process.env.DIALOG_ID || '7068ef6e-befb-4618-94e3-1f3dbb134c4f';
+var dialog_id = process.env.DIALOG_ID || 'f4b4a9ac-4791-4627-bfc9-d79500a9fcbb';
 
 // Create the service wrapper
 var dialog = watson.dialog(credentials);
@@ -46,16 +47,16 @@ var dialog = watson.dialog(credentials);
 //initially set as global variable
 var symptoms = ["headache", "vomiting"];
 var utility = new utilService();
+var inferenceEngineAPI = new inferenceEngine();
 
 app.post('/conversation', function(req, res, next) {
 
   var params = extend({ dialog_id: dialog_id }, req.body);
     //here parse the question and get the necessary data
 
+    if(req.body.input != null)
+        symptoms = utility.extractList(req.body.input,"I have");
 
-    symptoms = utility.extractList(req.body.input,"I have");
-
-    console.log(symptoms);
 
   dialog.conversation(params, function(err, results) {
     if (err)
@@ -88,7 +89,7 @@ app.get('/diagnosis',function(req,res,next){
     var list = [];
     symptoms.forEach(function(value){
 
-        dialog.getObservation(params, value.trim(),function(err,results){
+        inferenceEngineAPI.getObservation(params, value.trim(),function(err,results){
 
 
             list.push(results.body != null ? results.body.id : "*");
@@ -97,7 +98,7 @@ app.get('/diagnosis',function(req,res,next){
 
                 params.body = utility.constructDiagnosisBody("",list);
 
-                dialog.getDiagnosis(params,function(err1,results1){
+                inferenceEngineAPI.getDiagnosis(params,function(err1,results1){
 
                     if(err1)
                         return next(err1);
