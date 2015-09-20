@@ -54,7 +54,7 @@ app.post('/conversation', function(req, res, next) {
   var params = extend({ dialog_id: dialog_id }, req.body);
     //here parse the question and get the necessary data
 
-    if(req.body.input != null)
+    if(req.body.input != null && req.body.input.indexOf("I have") >= 0)
         symptoms = utility.extractList(req.body.input,"I have");
 
 
@@ -91,6 +91,7 @@ app.get('/diagnosis',function(req,res,next){
 
         inferenceEngineAPI.getObservation(params, value.trim(),function(err,results){
 
+            console.log(symptoms)
 
             list.push(results.body != null ? results.body.id : "*");
 
@@ -103,7 +104,7 @@ app.get('/diagnosis',function(req,res,next){
                     if(err1)
                         return next(err1);
                     else {
-                        res.json(results1.body.conditions[0]);
+                        res.json(results1.body.conditions ? results1.body.conditions[0] : 'No Match');
 
                     }
                 });
